@@ -45,6 +45,7 @@ const Sidebar = () => {
     const data = await createConversations();
     if (data) {
       dispatch(addConversation(data));
+      dispatch(setSelectedConversation(data))
     }
   };
 
@@ -101,7 +102,7 @@ const Sidebar = () => {
       <div className="flex flex-col h-full">
         <div
           id="header"
-          className="flex items-center gap-2.5 py-4 border-b-2 px-4 border-white/6"
+          className="flex items-center gap-2.5 h-15 py-4 border-b-2 px-4 border-white/6"
         >
           <div
             onClick={() => setSidebarOpen(false)}
