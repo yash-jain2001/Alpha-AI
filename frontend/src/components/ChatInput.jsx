@@ -1,13 +1,33 @@
-import { Mic, Paperclip, Send, SendHorizontal } from "lucide-react";
-import React from "react";
+import { Mic, Paperclip, SendHorizontal } from "lucide-react";
+import React, { useState } from "react";
+import sendMessage from "../features/sendMessage";
+import { useDispatch, useSelector } from "react-redux";
+import { addMessage } from "../redux/messageSlice";
 
 const ChatInput = () => {
+  const { selectedConversation } = useSelector((state) => state.conversations);
+
+  const dispatch = useDispatch();
+
+  const [value, setValue] = useState("");
+  const handleSendMessage = async () => {
+    const payload = {
+      prompt: value.trim(),
+      conversationId: selectedConversation._id,
+    };
+    dispatch(addMessage({ role: "user", content: value.trim() }));
+    setValue("");
+    const data = await sendMessage(payload);
+    dispatch(addMessage({ role: "assistant", content: data }));
+    console.log(data);
+  };
+
   return (
     <div className="w-full overflow-hidden px-3 md:px-5 py-4 border-t border-white/6 bg-[#0d0f14]">
-      <div className="flex flex-col gap-2 bg-white/3 border border-white/7 rounded-xl px-4 pt-3.5 pb-3">
+      <div className="flex flex-col gap-2 bg-white/3 border border-white/7 rounded-xl px-4 pt-1 pb-3">
         <textarea
-          name=""
-          id=""
+          onChange={(e) => setValue(e.target.value)}
+          value={value}
           placeholder="Ask anything..."
           className="w-full bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50"
         ></textarea>
@@ -20,7 +40,11 @@ const ChatInput = () => {
               <Mic size={16} />
             </button>
           </div>
-          <button className="flex items-center justify-center p-2 rounded-lg border-none cursor-pointer transition-all duration-150 bg-linear-to-br from-indigo-500 to-violet-700 hover:opacity-80 text-white">
+          <button
+            onClick={handleSendMessage}
+            disabled={!value}
+            className={`flex items-center justify-center p-2 rounded-lg border-none transition-all duration-150 ${value.trim() ? "bg-linear-to-br from-indigo-600 to-violet-700 cursor-pointer hover:opacity-80 text-white" : "bg-white/5 text-slate-600 cursor-not-allowed"}`}
+          >
             <SendHorizontal size={18} />
           </button>
         </div>
